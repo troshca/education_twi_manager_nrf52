@@ -47,7 +47,7 @@ extern "C"
 {
 #endif
 
-#include "main.h"
+//#include "main.h"
 
 // Registers
 #define DS1307_I2C_ADDR (0x68)

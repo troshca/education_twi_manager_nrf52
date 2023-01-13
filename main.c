@@ -1,5 +1,9 @@
 #include "main.h"
+
 NRF_TWI_MNGR_DEF(twi_mngr_instance, 5, TWI_INSTANCE_ID);
+APP_TIMER_DEF(m_repeated_timer_id);
+RTCDateTime r;	
+
 static void in_pin_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
   nrf_gpio_pin_toggle(LED_1);
@@ -30,9 +34,42 @@ static void gpiote_init()
   nrf_drv_gpiote_in_event_enable(BUTTON_1, true);
 }
 
+/**@brief Function starting the internal LFCLK oscillator.
+ *
+ * @details This is needed by RTC1 which is used by the Application Timer
+ *          (When SoftDevice is enabled the LFCLK is always running and this is not needed).
+ */
+static void lfclk_request(void)
+{
+    ret_code_t err_code = nrf_drv_clock_init();
+    APP_ERROR_CHECK(err_code);
+    nrf_drv_clock_lfclk_request(NULL);
+}
+
+/**@brief Timeout handler for the repeated timer.
+ */
+static void repeated_timer_handler(void * p_context)
+{
+    DS1307_GetDateTime(&r);
+    nrf_gpio_pin_toggle(LED_1);
+}
+
+/**@brief Create timers.
+ */
+static void create_timers()
+{
+    ret_code_t err_code;
+
+    // Create timers
+    err_code = app_timer_create(&m_repeated_timer_id,
+                                APP_TIMER_MODE_REPEATED,
+                                repeated_timer_handler);
+    APP_ERROR_CHECK(err_code);
+}
+
 int main(void)
 {
-  RTCDateTime r;	
+  ret_code_t err_code;
   nrf_gpio_cfg_output(LED_1);
   ret_code_t error_code = NRF_SUCCESS;
 
@@ -48,6 +85,7 @@ int main(void)
   i2c_config.scl = SCL_PIN_NUMBER;
   i2c_config.sda = SDA_PIN_NUMBER;
   i2c_config.frequency = NRF_TWIM_FREQ_100K;
+  i2c_config.interrupt_priority = 6;
   error_code = nrf_twi_mngr_init(&twi_mngr_instance, &i2c_config);
   APP_ERROR_CHECK(error_code);
 
@@ -57,12 +95,17 @@ int main(void)
   // set_input(DS1307_REG_SECOND);
   nrf_delay_ms(50);
   gpiote_init();
+  lfclk_request();
+  app_timer_init();
+  create_timers();
+  err_code = app_timer_start(m_repeated_timer_id, APP_TIMER_TICKS(1000), NULL);
+  APP_ERROR_CHECK(err_code);
   //r.Year = 2023;
   //r.DayOfWeek = 4;
   //r.Month = 1;
-  //r.Day = 12;
+  //r.Day = 13;
   //r.Hour = 16;
-  //r.Minute = 46;
+  //r.Minute = 0;
   //r.Second = 0;
   //DS1307_SetDateTime(&r);
   // DS1307_Init(&m_twi);
@@ -89,7 +132,7 @@ int main(void)
     //second = DS1307_GetSecond();
     // zone_hr = DS1307_GetTimeZoneHour();
     // zone_min = DS1307_GetTimeZoneMin();
-    DS1307_GetDateTime(&r);
+    //DS1307_GetDateTime(&r);
     NRF_LOG_INFO("%04d-%02d-%02d %02d:%02d:%02d%", r.Year, r.Month, r.Day, r.Hour, r.Minute, r.Second);
     //NRF_LOG_INFO("%04d-%02d-%02d %02d:%02d:%02d%", year, month, date, hour, minute, second);
     NRF_LOG_FLUSH();
