@@ -1,0 +1,7 @@
+/.vs
+CustomBoardNRF52832/blank/armgcc/_build
+CustomBoardNRF52832/blank/ses/Output
+**/bin
+**/obj
+*.emSession
+*.jlink

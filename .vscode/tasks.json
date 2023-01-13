@@ -1,0 +1,80 @@
+{
+    "version": "2.0.0",
+    "tasks": [{
+        "label": "build",
+        "type": "shell",
+        "command": "make",
+        "options": {
+          "cwd": "${workspaceFolder}/CustomBoardNRF52832/armgcc"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "build and run",
+        "type": "shell",
+        "command": "make -and make flash",
+        "options": {
+          "cwd": "${workspaceFolder}/CustomBoardNRF52832/armgcc"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "clean",
+        "type": "shell",
+        "command": "make clean",
+        "options": {
+          "cwd": "${workspaceFolder}/CustomBoardNRF52832/armgcc"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "terminal",
+        "type": "shell",
+        "command": "minicom",
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "RTT",
+        "type": "shell",
+        "command": "JLinkExe -device NRF52 -if SWD -speed 4000 -autoconnect 1",
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "flash",
+        "type": "shell",
+        "command": "make flash",
+        "options": {
+          "cwd": "${workspaceFolder}/CustomBoardNRF52832/armgcc"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "flash_softdevice",
+        "type": "shell",
+        "command": "make flash_softdevice",
+        "options": {
+          "cwd": "${workspaceFolder}/CustomBoardNRF52832/armgcc"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "sdk_config",
+        "type": "shell",
+        "command": "make sdk_config",
+        "options": {
+          "cwd": "${workspaceFolder}/CustomBoardNRF52832/armgcc"
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
