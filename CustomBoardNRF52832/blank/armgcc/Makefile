@@ -56,6 +56,8 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/bsp/bsp.c \
   $(PROJ_DIR)/main.c \
   $(PROJ_DIR)/twi_mng_ds1307.c \
+  $(PROJ_DIR)/twi_mng_ssd1306.c \
+  $(PROJ_DIR)/ssd1306_fonts.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \

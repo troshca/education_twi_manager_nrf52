@@ -96,6 +96,13 @@
     <folder Name="Drivers">
       <file file_name="../../../twi_mng_ds1307.h" />
       <file file_name="../../../twi_mng_ds1307.c" />
+      <file file_name="../../../twi_mng_ssd1306.h" />
+      <file file_name="../../../twi_mng_ssd1306.c" />
+      <file file_name="../../../SSD1306_conf.h" />
+      <file file_name="../../../SSD1306_fonts.c" />
+      <file file_name="../../../SSD1306_fonts.h" />
+      <file file_name="../../../SSD1306_tests.c" />
+      <file file_name="../../../SSD1306_tests.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../../../../../../external/segger_rtt/SEGGER_RTT.c" />
