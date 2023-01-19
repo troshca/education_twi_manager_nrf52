@@ -33,26 +33,26 @@ void ssd1306_WriteCommand(uint8_t byte)
 }
 
 /**
- * @brief 
- * @note 
+ * @brief
+ * @note
  */
 static void ssd1306_WriteCommandSchedule(uint8_t byte)
 {
     ret_code_t err_code;
     static uint8_t buffer[2];
     buffer[0] = 0x00;
-    //buffer[1] = 0x00;
+    // buffer[1] = 0x00;
     buffer[1] = byte;
-	static nrf_twi_mngr_transfer_t const transfers[] =
-		{
-			NRF_TWI_MNGR_WRITE(SSD1306_I2C_ADDR, buffer, 2, NRF_TWI_MNGR_NO_STOP),
-		};
-	static nrf_twi_mngr_transaction_t NRF_TWI_MNGR_BUFFER_LOC_IND transaction =
-		{
-			.p_user_data = NULL,
-			.p_transfers = transfers,
-			.number_of_transfers = sizeof(transfers) / sizeof(transfers[0])};
-	APP_ERROR_CHECK(nrf_twi_mngr_schedule(TWI_manager, &transaction));
+    static nrf_twi_mngr_transfer_t const transfers[] =
+        {
+            NRF_TWI_MNGR_WRITE(SSD1306_I2C_ADDR, buffer, 2, NRF_TWI_MNGR_NO_STOP),
+        };
+    static nrf_twi_mngr_transaction_t NRF_TWI_MNGR_BUFFER_LOC_IND transaction =
+        {
+            .p_user_data = NULL,
+            .p_transfers = transfers,
+            .number_of_transfers = sizeof(transfers) / sizeof(transfers[0])};
+    APP_ERROR_CHECK(nrf_twi_mngr_schedule(TWI_manager, &transaction));
 }
 
 void ssd1306_WriteData(uint8_t *bufp, size_t buff_size)
@@ -77,8 +77,8 @@ void ssd1306_WriteData(uint8_t *bufp, size_t buff_size)
 }
 
 /**
- * @brief 
- * @note 
+ * @brief
+ * @note
  */
 static void ssd1306_WriteDataSchedule(uint8_t *bufp, size_t buff_size)
 {
@@ -87,16 +87,16 @@ static void ssd1306_WriteDataSchedule(uint8_t *bufp, size_t buff_size)
     memset(buffer, 0x40, 1);
     memcpy(buffer + 1, bufp, SSD1306_WIDTH);
 
-	static nrf_twi_mngr_transfer_t const transfers[] =
-		{
-			NRF_TWI_MNGR_WRITE(SSD1306_I2C_ADDR, buffer, SSD1306_WIDTH + 1, NRF_TWI_MNGR_NO_STOP),
-		};
-	static nrf_twi_mngr_transaction_t NRF_TWI_MNGR_BUFFER_LOC_IND transaction =
-		{
-			.p_user_data = NULL,
-			.p_transfers = transfers,
-			.number_of_transfers = sizeof(transfers) / sizeof(transfers[0])};
-	APP_ERROR_CHECK(nrf_twi_mngr_schedule(TWI_manager, &transaction));
+    static nrf_twi_mngr_transfer_t const transfers[] =
+        {
+            NRF_TWI_MNGR_WRITE(SSD1306_I2C_ADDR, buffer, SSD1306_WIDTH + 1, NRF_TWI_MNGR_NO_STOP),
+        };
+    static nrf_twi_mngr_transaction_t NRF_TWI_MNGR_BUFFER_LOC_IND transaction =
+        {
+            .p_user_data = NULL,
+            .p_transfers = transfers,
+            .number_of_transfers = sizeof(transfers) / sizeof(transfers[0])};
+    APP_ERROR_CHECK(nrf_twi_mngr_schedule(TWI_manager, &transaction));
 }
 
 static uint8_t SSD1306_Buffer[SSD1306_BUFFER_SIZE];
