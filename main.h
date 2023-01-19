@@ -20,6 +20,7 @@
 //TWI manager
 #include "twi_mng_ds1307.h"
 #include "twi_mng_ssd1306.h"
+#include "twi_mng_hdc1080.h"
 
 #define TWI_INSTANCE_ID     0
 

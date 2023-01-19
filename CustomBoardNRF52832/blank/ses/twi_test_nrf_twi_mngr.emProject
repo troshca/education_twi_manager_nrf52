@@ -103,6 +103,8 @@
       <file file_name="../../../SSD1306_fonts.h" />
       <file file_name="../../../SSD1306_tests.c" />
       <file file_name="../../../SSD1306_tests.h" />
+	  <file file_name="../../../twi_mng_hdc1080.h" />
+	  <file file_name="../../../twi_mng_hdc1080.c" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../../../../../../external/segger_rtt/SEGGER_RTT.c" />
