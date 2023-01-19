@@ -92,7 +92,7 @@ extern "C"
 		uint8_t DayOfWeek;
 	} RTCDateTime;
 
-	void DS1307_Init(nrf_twi_mngr_t *nrf_twi_mngr_t);
+	void DS1307_Init(nrf_twi_mngr_t *nrf_twi_mngr_t, RTCDateTime *datetime);
 
 	void DS1307_SetClockHalt(uint8_t halt);
 	uint8_t DS1307_GetClockHalt(void);
@@ -102,6 +102,9 @@ extern "C"
 
 	void DS1307_SetEnableSquareWave(DS1307_SquareWaveEnable mode);
 	void DS1307_SetInterruptRate(DS1307_Rate rate);
+
+        static void DS1307_GetDateTimeSchedule();
+        void DS1307_ScheduleDateAndTime();
 
 	uint8_t DS1307_GetDayOfWeek(void);
 	uint8_t DS1307_GetDate(void);

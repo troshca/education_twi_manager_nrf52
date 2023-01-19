@@ -3,26 +3,29 @@
  *
  *	The MIT License.
  *      Created on: 09.01.2022
- *      Author:
+ *      Author: troshca
  *		Contact:
  *
  *      Website:
- *      GitHub:
+ *      GitHub: https://github.com/troshca
  */
 
 #include "main.h"
 #include "twi_mng_ds1307.h"
 
 static const nrf_twi_mngr_t *TWI_manager = NULL;
+RTCDateTime *DateTime;
 uint8_t DS1307Buffer[7];
 
 /**
- * @brief Initializes the DS1307 module. Sets clock halt bit to 0 to start timing.
- * @param nrf_twi_mngr_t User TWI Manager handle pointer.
+ * @brief Initializes the DS1307 module, sets TWI_manager. Sets clock halt bit to 0 to start timing.
+ * @param nrf_twi_mngr_t Pointer to the TWI transaction manager instance.
+ * @param datetime Pointer to the user RTCDateTime struc
  */
-void DS1307_Init(nrf_twi_mngr_t *nrf_twi_mngr_t)
+void DS1307_Init(nrf_twi_mngr_t *nrf_twi_mngr_t, RTCDateTime *datetime)
 {
 	TWI_manager = nrf_twi_mngr_t;
+	DateTime = datetime;
 	DS1307_SetClockHalt(0);
 }
 
@@ -46,7 +49,7 @@ uint8_t DS1307_GetClockHalt(void)
 }
 
 /**
- * @brief Sets the byte in the designated DS1307 register to value.
+ * @brief Sets the byte in the designated DS1307 register to value by TWI Manager
  * @param regAddr Register address to write.
  * @param val Value to set, 0 to 255.
  */
@@ -70,7 +73,6 @@ void DS1307_SetRegByteTWIManager(uint8_t regAddr, uint8_t val)
 uint8_t DS1307_GetRegByteTWIManager(uint8_t regAddr)
 {
 	uint8_t val;
-
 	nrf_twi_mngr_transfer_t const read_transfer[] =
 		{
 			NRF_TWI_MNGR_WRITE(DS1307_I2C_ADDR, &regAddr, 1, NRF_TWI_MNGR_NO_STOP),
@@ -78,7 +80,6 @@ uint8_t DS1307_GetRegByteTWIManager(uint8_t regAddr)
 		};
 	ret_code_t error_code = nrf_twi_mngr_perform(TWI_manager, NULL, read_transfer, 2, NULL);
 	APP_ERROR_CHECK(error_code);
-
 	return val;
 }
 
@@ -115,9 +116,9 @@ uint8_t DS1307_GetDayOfWeek(void)
 
 /**
  * @brief Calculate Date and Time from DS1307_GetDateTime
- *
+ * @param DateTime RTCDateTime pointer
  */
-void DS1307_CalculateDateTime(RTCDateTime *DateTime)
+void DS1307_CalculateDateTime()
 {
 	DateTime->Second = DS1307_DecodeBCD(DS1307Buffer[0]);
 	DateTime->Minute = DS1307_DecodeBCD(DS1307Buffer[1]);
@@ -126,6 +127,50 @@ void DS1307_CalculateDateTime(RTCDateTime *DateTime)
 	DateTime->Day = DS1307_DecodeBCD(DS1307Buffer[4]);
 	DateTime->Month = DS1307_DecodeBCD(DS1307Buffer[5] & 0x1F);
 	DateTime->Year = 2000 + DS1307_DecodeBCD(DS1307Buffer[6]);
+}
+
+/**
+ * @brief Callback from DS1307_GetDateTimeSchedule.
+ * @note call DS1307_CalculateDateTime to convert array
+ */
+void DS1307_ScheduleDateAndTime()
+{
+	DS1307_GetDateTimeSchedule();
+}
+
+/**
+ * @brief Callback from DS1307_GetDateTimeSchedule.
+ * @note call DS1307_CalculateDateTime to convert array.
+ * @note
+ */
+void DS1307_ReadDateTimeRegisters(ret_code_t result, void *p_user_data)
+{
+	if (result != NRF_SUCCESS)
+	{
+		NRF_LOG_WARNING("DS1307_ReadDateTimeRegisters - error: %d", (int)result);
+		return;
+	}
+	DS1307_CalculateDateTime();
+}
+
+/**
+ * @brief Gets the current time and date
+ * @note call DS1307_CalculateDateTime to convert array
+ */
+static void DS1307_GetDateTimeSchedule()
+{
+	static nrf_twi_mngr_transfer_t const transfers[] =
+		{
+			NRF_TWI_MNGR_WRITE(DS1307_I2C_ADDR, DS1307_REG_SECOND, 1, NRF_TWI_MNGR_NO_STOP),
+			NRF_TWI_MNGR_READ(DS1307_I2C_ADDR, &DS1307Buffer, 7, 0),
+		};
+	static nrf_twi_mngr_transaction_t NRF_TWI_MNGR_BUFFER_LOC_IND transaction =
+		{
+			.callback = DS1307_ReadDateTimeRegisters,
+			.p_user_data = NULL,
+			.p_transfers = transfers,
+			.number_of_transfers = sizeof(transfers) / sizeof(transfers[0])};
+	APP_ERROR_CHECK(nrf_twi_mngr_schedule(TWI_manager, &transaction));
 }
 
 /**
@@ -148,12 +193,11 @@ void DS1307_WriteMem(uint8_t reg, uint8_t *bufp, uint16_t len)
 }
 
 /**
- * @brief Gets the current day of month.
+ * @brief Gets the current time and date
  * @note call DS1307_CalculateDateTime to convert array
  */
 void DS1307_GetDateTime(RTCDateTime *DateTime)
 {
-
 	nrf_twi_mngr_transfer_t const read_transfer[] =
 		{
 			NRF_TWI_MNGR_WRITE(DS1307_I2C_ADDR, DS1307_REG_SECOND, 1, NRF_TWI_MNGR_NO_STOP),

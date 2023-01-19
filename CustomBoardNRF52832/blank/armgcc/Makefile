@@ -55,9 +55,6 @@ SRC_FILES += \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uarte.c \
   $(SDK_ROOT)/components/libraries/bsp/bsp.c \
   $(PROJ_DIR)/main.c \
-  $(PROJ_DIR)/twi_mng_ds1307.c \
-  $(PROJ_DIR)/twi_mng_ssd1306.c \
-  $(PROJ_DIR)/ssd1306_fonts.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
@@ -120,7 +117,7 @@ CFLAGS += -DNRF52832_XXAA
 CFLAGS += -DNRF52_PAN_74
 CFLAGS += -mcpu=cortex-m4
 CFLAGS += -mthumb -mabi=aapcs
-CFLAGS += -Wall -error
+CFLAGS += -Wall -Werror
 CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 # keep every function in a separate section, this allows linker to discard unused ones
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing

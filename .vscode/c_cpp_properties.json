@@ -7,7 +7,7 @@
             "name": "ARMGCC",
             "includePath": [
                 "${workspaceFolder}/",
-                "${workspaceFolder}/CustomBoardNRF52832/config",
+                "${workspaceFolder}/CustomBoardNRF52832/blank/config",
                 "${nrfSDK}/components",
                 "${nrfSDK}/components/ble/ble_advertising",
                 "${nrfSDK}/components/ble/ble_dtm",

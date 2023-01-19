@@ -32,6 +32,29 @@ void ssd1306_WriteCommand(uint8_t byte)
     APP_ERROR_CHECK(error_code);
 }
 
+/**
+ * @brief 
+ * @note 
+ */
+static void ssd1306_WriteCommandSchedule(uint8_t byte)
+{
+    ret_code_t err_code;
+    static uint8_t buffer[2];
+    buffer[0] = 0x00;
+    //buffer[1] = 0x00;
+    buffer[1] = byte;
+	static nrf_twi_mngr_transfer_t const transfers[] =
+		{
+			NRF_TWI_MNGR_WRITE(SSD1306_I2C_ADDR, buffer, 2, NRF_TWI_MNGR_NO_STOP),
+		};
+	static nrf_twi_mngr_transaction_t NRF_TWI_MNGR_BUFFER_LOC_IND transaction =
+		{
+			.p_user_data = NULL,
+			.p_transfers = transfers,
+			.number_of_transfers = sizeof(transfers) / sizeof(transfers[0])};
+	APP_ERROR_CHECK(nrf_twi_mngr_schedule(TWI_manager, &transaction));
+}
+
 void ssd1306_WriteData(uint8_t *bufp, size_t buff_size)
 {
     ret_code_t err_code;
@@ -51,6 +74,29 @@ void ssd1306_WriteData(uint8_t *bufp, size_t buff_size)
     //     err_code = nrf_drv_twi_tx(_ssd1306_m_twi, SSD1306_I2C_ADDR, buffer, buff_size, true);
     // }
     nrf_delay_ms(1);
+}
+
+/**
+ * @brief 
+ * @note 
+ */
+static void ssd1306_WriteDataSchedule(uint8_t *bufp, size_t buff_size)
+{
+    ret_code_t err_code;
+    static uint8_t buffer[1 + SSD1306_WIDTH];
+    memset(buffer, 0x40, 1);
+    memcpy(buffer + 1, bufp, SSD1306_WIDTH);
+
+	static nrf_twi_mngr_transfer_t const transfers[] =
+		{
+			NRF_TWI_MNGR_WRITE(SSD1306_I2C_ADDR, buffer, SSD1306_WIDTH + 1, NRF_TWI_MNGR_NO_STOP),
+		};
+	static nrf_twi_mngr_transaction_t NRF_TWI_MNGR_BUFFER_LOC_IND transaction =
+		{
+			.p_user_data = NULL,
+			.p_transfers = transfers,
+			.number_of_transfers = sizeof(transfers) / sizeof(transfers[0])};
+	APP_ERROR_CHECK(nrf_twi_mngr_schedule(TWI_manager, &transaction));
 }
 
 static uint8_t SSD1306_Buffer[SSD1306_BUFFER_SIZE];
@@ -191,9 +237,9 @@ void ssd1306_UpdateScreen(void)
     for (uint8_t i = 0; i < SSD1306_HEIGHT / 8; i++)
     {
         ssd1306_WriteCommand(0xB0 + i); // Set the current RAM page address.
-        ssd1306_WriteCommand(0x00 + SSD1306_X_OFFSET_LOWER);
-        ssd1306_WriteCommand(0x10 + SSD1306_X_OFFSET_UPPER);
-        ssd1306_WriteData(&SSD1306_Buffer[SSD1306_WIDTH * i], SSD1306_WIDTH);
+        ssd1306_WriteCommandSchedule(0x00 + SSD1306_X_OFFSET_LOWER);
+        ssd1306_WriteCommandSchedule(0x10 + SSD1306_X_OFFSET_UPPER);
+        ssd1306_WriteDataSchedule(&SSD1306_Buffer[SSD1306_WIDTH * i], SSD1306_WIDTH);
     }
 }
 
